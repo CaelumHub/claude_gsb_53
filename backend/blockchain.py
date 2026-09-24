@@ -165,6 +165,8 @@ class Blockchain:
                    "return": None, "transfers": [], "type": tx.tx_type,
                    "contract": None}
         try:
+            if not tx.validate_addresses():
+                raise ChainValidationError("invalid transaction address")
             if tx.tx_type == "transfer":
                 if state.balance(tx.sender) < tx.amount + tx.fee:
                     raise ChainValidationError("insufficient balance")
@@ -243,8 +245,10 @@ class Blockchain:
             return False, reason
         if block.difficulty != pow_mod.next_difficulty(self, block):
             return False, "difficulty does not match schedule"
-        # Verify transaction signatures and sender authenticity.
+        # Verify transaction addresses, signatures, and sender authenticity.
         for tx in block.transactions:
+            if not tx.validate_addresses():
+                return False, f"invalid address on tx {tx.txid}"
             if tx.is_coinbase():
                 if tx.amount != COINBASE_REWARD:
                     return False, "coinbase reward mismatch"

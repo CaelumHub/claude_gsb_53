@@ -123,6 +123,8 @@ class ContractEngine:
                 raise SandboxError(f"require failed: {message}")
 
         def transfer(to, amount):
+            if not crypto.is_valid_address(to):
+                raise SandboxError("transfer recipient must be a valid address")
             amount = float(amount)
             if amount < 0:
                 raise SandboxError("transfer amount must be non-negative")

@@ -68,6 +68,8 @@ class TxPool:
             return False, "invalid signature"
         if tx.derived_sender() != tx.sender:
             return False, "sender does not match public key"
+        if not tx.validate_addresses():
+            return False, "invalid transaction address"
         if tx.sender in self._by_sender:
             return False, "sender already has a pending transaction"
         if tx.fee < 0 or tx.amount < 0:

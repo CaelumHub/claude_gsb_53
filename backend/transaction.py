@@ -117,6 +117,18 @@ class Transaction:
         except Exception:
             return None
 
+    def validate_addresses(self):
+        """Validate the address fields used by this transaction type."""
+        if self.tx_type == TX_COINBASE:
+            return crypto.is_valid_address(self.to)
+        if not crypto.is_valid_address(self.sender):
+            return False
+        if self.tx_type == TX_DEPLOY:
+            return self.to is None
+        if self.tx_type in (TX_TRANSFER, TX_CALL):
+            return crypto.is_valid_address(self.to)
+        return False
+
     def is_coinbase(self):
         return self.tx_type == TX_COINBASE
 
