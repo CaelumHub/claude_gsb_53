@@ -166,6 +166,9 @@ class Blockchain:
                    "contract": None}
         try:
             if tx.tx_type == "transfer":
+                if not crypto.is_valid_address(tx.to):
+                    raise ChainValidationError(
+                        "transfer recipient is not a valid address")
                 if state.balance(tx.sender) < tx.amount + tx.fee:
                     raise ChainValidationError("insufficient balance")
                 state.add_balance(tx.sender, -tx.amount)

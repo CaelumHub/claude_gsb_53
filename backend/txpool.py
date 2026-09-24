@@ -16,6 +16,7 @@ transactions from abandoned blocks are re-admitted so they are not lost.
 
 import time
 
+from . import crypto
 from .config import TXPOOL_SORT_KEY
 from .transaction import Transaction
 
@@ -77,8 +78,8 @@ class TxPool:
             return False, (f"nonce {tx.nonce} != expected {expected_nonce} "
                            f"(account nonce)")
         if tx.tx_type == "transfer":
-            if not tx.to:
-                return False, "transfer requires a recipient"
+            if not crypto.is_valid_address(tx.to):
+                return False, "transfer recipient is not a valid address"
             if world_state.balance(tx.sender) < tx.amount + tx.fee:
                 return False, "insufficient balance"
         elif tx.tx_type == "deploy":
